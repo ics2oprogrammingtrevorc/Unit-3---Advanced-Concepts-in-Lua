@@ -1,0 +1,5 @@
+    bkg_image = display.newImage("Images/Instructions Screen.png")
+    bkg_image.x = display.contentCenterX
+    bkg_image.y = display.contentCenterY
+    bkg_image.width = display.contentWidth
+    bkg_image.height = display.contentHeight

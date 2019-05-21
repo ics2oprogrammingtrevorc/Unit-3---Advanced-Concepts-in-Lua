@@ -29,20 +29,32 @@ sceneName = "main_menu"
 local scene = composer.newScene( sceneName )
 
 -----------------------------------------------------------------------------------------
+-- GLOBAL SOUNDS
+-----------------------------------------------------------------------------------------
+
+bkgMusic = audio.loadSound( "Audio/sound.mp3" )
+bkgMusicChannel = audio.play(bkgMusic, {loops= -1})
+
+-----------------------------------------------------------------------------------------
+-- GLOBAL VARIABLES
+-----------------------------------------------------------------------------------------
+soundOn = true
+
+-----------------------------------------------------------------------------------------
 -- LOCAL VARIABLES
 -----------------------------------------------------------------------------------------
 local bkg_image
 local playButton
 local creditsButton
 local InstructionsButton
--------------------------------------------------------------------\
+
 --Mute Button
---------------------------------------------------------
-soundOn = true
 local muteButton
 local unMuteButton
-local bkgMusic = audio.loadSound( "Audio/sound.mp3" )
-local bkgMusicChanel
+
+-----------------------------------------------------------------------------------------
+-- LOCAL FUNCTIONS
+-----------------------------------------------------------------------------------------
 
 local function Mute(touch)
     if (touch.phase == "ended") then
@@ -61,22 +73,6 @@ local function UnMute(touch)
         unMuteButton.isVisible = false
     end
 end
-
-
-muteButton = display.newImageRect("Images/MuteButtonUnpressedAliceR.png", 100, 100)
-muteButton.x = display.contentWidth*9/10
-muteButton.y = display.contentHeight*1/10
-muteButton.isVisible = true
-
-unMuteButton = display.newImageRect("Images/MuteButtonPressedAliceR.png", 100, 100)
-unMuteButton.x = display.contentWidth*9/10
-unMuteButton.y = display.contentHeight*1/10
-unMuteButton.isVisible = false
------------------------------------------------------------------------------------------
--- LOCAL FUNCTIONS
------------------------------------------------------------------------------------------
-
-
 
 -- Creating Transition Function to Credits Page
 local function CreditsTransition( )       
@@ -122,21 +118,9 @@ function scene:create( event )
     bkg_image.width = display.contentWidth
     bkg_image.height = display.contentHeight
 
-
-    -- Associating display objects with this scene 
-    sceneGroup:insert( bkg_image )
-
-    -- Send the background image to the back layer so all other objects can be on top
-    bkg_image:toBack()
-
     -----------------------------------------------------------------------------------------
     -- BUTTON WIDGETS
     -----------------------------------------------------------------------------------------   
-
-
-
-
-
     -- Creating Play Button
     playButton = widget.newButton( 
         {   
@@ -191,14 +175,29 @@ function scene:create( event )
             onRelease = CreditsTransition
         } ) 
     
-    -- ADD INSTRUCTIONS BUTTON WIDGET
+    
+    
+    muteButton = display.newImageRect("Images/MuteButtonUnpressedAliceR.png", 100, 100)
+    muteButton.x = display.contentWidth*9/10
+    muteButton.y = display.contentHeight*1/10
+    muteButton.isVisible = true
+        
+
+
+    unMuteButton = display.newImageRect("Images/MuteButtonPressedAliceR.png", 100, 100)
+    unMuteButton.x = display.contentWidth*9/10
+    unMuteButton.y = display.contentHeight*1/10
+    unMuteButton.isVisible = false
 
     -----------------------------------------------------------------------------------------
 
     -- Associating button widgets with this scene
+    sceneGroup:insert( bkg_image )
     sceneGroup:insert( playButton )
     sceneGroup:insert( creditsButton )
     sceneGroup:insert( InstructionsButton )
+    sceneGroup:insert( muteButton )
+    sceneGroup:insert( unMuteButton )
     
     -- INSERT INSTRUCTIONS BUTTON INTO SCENE GROUP
 
@@ -229,9 +228,9 @@ function scene:show( event )
     -- Insert code here to make the scene come alive.
     -- Example: start timers, begin animation, play audio, etc.
     elseif ( phase == "did" ) then       
-        bkgMusicChanel = audio.play(bkgMusic, {loops= -1})
+        
         muteButton:addEventListener("touch", Mute)
-        unMuteButton:addEventListener("touch", UnMute)
+        unMuteButton:addEventListener("touch", UnMute)      
     end
 
 end -- function scene:show( event )
@@ -262,6 +261,8 @@ function scene:hide( event )
 
     elseif ( phase == "did" ) then
         -- Called immediately after scene goes off screen.
+        muteButton:removeEventListener("touch", Mute)
+        unMuteButton:removeEventListener("touch", UnMute) 
     end
 
 end -- function scene:hide( event )

@@ -28,10 +28,32 @@ scene = composer.newScene( sceneName ) -- This function doesn't accept a string,
 -----------------------------------------------------------------------------------------
 local bkg_image
 local backButton
+--Mute Button
+local muteButton
+local unMuteButton
 
 -----------------------------------------------------------------------------------------
 -- LOCAL FUNCTIONS
 -----------------------------------------------------------------------------------------
+
+local function Mute(touch)
+    if (touch.phase == "ended") then
+        audio.pause(bkgMusic)
+        soundOn = false
+        muteButton.isVisible = false
+        unMuteButton.isVisible = true
+    end
+end
+
+local function UnMute(touch)
+    if (touch.phase == "ended") then
+        audio.resume(bkgMusic)
+        soundOn = true
+        muteButton.isVisible = true
+        unMuteButton.isVisible = false
+    end
+end
+
 
 -- Creating Transitioning Function back to main menu
 local function BackTransition( )
@@ -89,12 +111,26 @@ function scene:create( event )
         onRelease = BackTransition
 
     } )
+    muteButton = display.newImageRect("Images/MuteButtonUnpressedAliceR.png", 100, 100)
+    muteButton.x = display.contentWidth*9/10
+    muteButton.y = display.contentHeight*1/10
+    muteButton.isVisible = true
+        
 
+
+    unMuteButton = display.newImageRect("Images/MuteButtonPressedAliceR.png", 100, 100)
+    unMuteButton.x = display.contentWidth*9/10
+    unMuteButton.y = display.contentHeight*1/10
+    unMuteButton.isVisible = false
     -----------------------------------------------------------------------------------------
 
     -- Associating Buttons with this scene
     sceneGroup:insert( backButton )
+    sceneGroup:insert( muteButton )
+    sceneGroup:insert( unMuteButton )
+
     
+
 end --function scene:create( event )
 
 -----------------------------------------------------------------------------------------
@@ -117,6 +153,9 @@ function scene:show( event )
     -----------------------------------------------------------------------------------------
 
     elseif ( phase == "did" ) then
+
+        muteButton:addEventListener("touch", Mute)
+        unMuteButton:addEventListener("touch", UnMute) 
         -- Called when the scene is now on screen.
         -- Insert code here to make the scene come alive.
         -- Example: start timers, begin animation, play audio, etc.
@@ -146,6 +185,8 @@ function scene:hide( event )
     -----------------------------------------------------------------------------------------
 
     elseif ( phase == "did" ) then
+        muteButton:removeEventListener("touch", Mute)
+        unMuteButton:removeEventListener("touch", UnMute) 
         -- Called immediately after scene goes off screen.
     end
 

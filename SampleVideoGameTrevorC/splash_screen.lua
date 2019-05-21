@@ -38,11 +38,35 @@ local scrollSpeed = 3
 -- LOCAL FUNCTIONS
 --------------------------------------------------------------------------------------------
 
--- The function that moves the beetleship across the screen
-
 -- The function that will go to the main menu 
 local function gotoMainMenu()
     composer.gotoScene( "main_menu" )
+end
+
+
+-----------------------------------------------------------------------------------------
+-- GLOBAL FUNCTIONS
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------
+function stopPaw()
+    Runtime:removeEventListener("enterFrame", movePaw)
+    paw.x = display.contentCenterX
+    paw.y = display.contentCenterY
+end
+-------------------------------------------------------------
+function movePaw(event)
+    paw.x = paw.x + scrollSpeed
+    paw.y = paw.y - scrollSpeed
+    -- fade in
+    paw.alpha = paw.alpha + 0.02
+    -- rotates
+    paw:rotate(20.86)
+    -- Makes it bigger
+    paw.xScale = paw.xScale + 0.05
+    paw.yScale = paw.yScale + 0.05
+    if (paw.x >= display.contentCenterX) then
+        stopPaw()
+    end
 end
 
 -----------------------------------------------------------------------------------------
@@ -71,27 +95,6 @@ function scene:create( event )
 
 end -- function scene:create( event )
 
------------------------------------------------------------------
-function stopPaw()
-    Runtime:removeEventListener("enterFrame", movePaw)
-    paw.x = display.contentCenterX
-    paw.y = display.contentCenterY
-end
--------------------------------------------------------------
-function movePaw(event)
-    paw.x = paw.x + scrollSpeed
-    paw.y = paw.y - scrollSpeed
-    -- fade in
-    paw.alpha = paw.alpha + 0.02
-    -- rotates
-    paw:rotate(20.86)
-    -- Makes it bigger
-    paw.xScale = paw.xScale + 0.05
-    paw.yScale = paw.yScale + 0.05
-    if (paw.x >= display.contentCenterX) then
-        stopPaw()
-    end
-end
 --------------------------------------------------------------------------------------------
 
 -- The function called when the scene is issued to appear on screen
@@ -113,7 +116,7 @@ function scene:show( event )
 
     elseif ( phase == "did" ) then
         -- start the splash screen music
-       
+        Runtime:addEventListener("enterFrame", movePaw)
         -- Go to the main menu screen after the given time.
         timer.performWithDelay ( 3000, gotoMainMenu)          
         
@@ -142,7 +145,7 @@ function scene:hide( event )
     -- Called immediately after scene goes off screen.
     elseif ( phase == "did" ) then
         
-        -- stop the jungle sounds channel for this screen
+        Runtime:removeEventListener("enterFrame", movePaw)
     end
 
 end --function scene:hide( event )
@@ -172,7 +175,7 @@ scene:addEventListener( "create", scene )
 scene:addEventListener( "show", scene )
 scene:addEventListener( "hide", scene )
 scene:addEventListener( "destroy", scene )
-Runtime:addEventListener("enterFrame", movePaw)
+
 
 -----------------------------------------------------------------------------------------
 

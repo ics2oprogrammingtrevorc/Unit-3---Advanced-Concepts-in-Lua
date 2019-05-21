@@ -108,6 +108,9 @@ local function DetermineAlternateAnswers()
     alternateAnswer2 = correctAnswer - math.random(1, 2)
     alternateAnswerBox2.text = alternateAnswer2
 
+    alternateAnswer3 = correctAnswer + math.random(10, 20)
+    alternateAnswerBox3.text = alternateAnswer3
+
 -------------------------------------------------------------------------------------------
 -- RESET ALL X POSITIONS OF ANSWER BOXES (because the x-position is changed when it is
 -- placed into the black box)
@@ -115,6 +118,7 @@ local function DetermineAlternateAnswers()
     answerbox.x = display.contentWidth * 0.9
     alternateAnswerBox1.x = display.contentWidth * 0.9
     alternateAnswerBox2.x = display.contentWidth * 0.9
+    alternateAnswerBox3.x = display.contentWidth * 0.9
 
 
 end
@@ -138,10 +142,14 @@ local function PositionAnswers()
         --alternateAnswerBox1
         alternateAnswerBox1.y = display.contentHeight * 0.55
 
+        alternateAnswerBox3.y = display.contentHeight * 0.85
+
         ---------------------------------------------------------
         --remembering their positions to return the answer in case it's wrong
         alternateAnswerBox1PreviousY = alternateAnswerBox1.y
         alternateAnswerBox2PreviousY = alternateAnswerBox2.y
+        alternateAnswerBox3PreviousY = alternateAnswerBox3.y
+
         answerboxPreviousY = answerbox.y 
 
     -- random position 2
@@ -151,6 +159,7 @@ local function PositionAnswers()
         
         --alternateAnswerBox2
         alternateAnswerBox2.y = display.contentHeight * 0.4
+        alternateAnswerBox3.y = display.contentHeight * 0.4
 
         --alternateAnswerBox1
         alternateAnswerBox1.y = display.contentHeight * 0.7
@@ -158,6 +167,8 @@ local function PositionAnswers()
         --remembering their positions to return the answer in case it's wrong
         alternateAnswerBox1PreviousY = alternateAnswerBox1.y
         alternateAnswerBox2PreviousY = alternateAnswerBox2.y
+        alternateAnswerBox3PreviousY = alternateAnswerBox3.y
+
         answerboxPreviousY = answerbox.y 
 
     -- random position 3
@@ -166,6 +177,7 @@ local function PositionAnswers()
 
         --alternateAnswerBox2
         alternateAnswerBox2.y = display.contentHeight * 0.55
+        alternateAnswerBox3.y = display.contentHeight * 0.7
 
         --alternateAnswerBox1
         alternateAnswerBox1.y = display.contentHeight * 0.4
@@ -173,6 +185,8 @@ local function PositionAnswers()
         --remembering their positions to return the answer in case it's wrong
         alternateAnswerBox1PreviousY = alternateAnswerBox1.y
         alternateAnswerBox2PreviousY = alternateAnswerBox2.y
+        alternateAnswerBox3PreviousY = alternateAnswerBox3.y
+
         answerboxPreviousY = answerbox.y 
     end
 end
@@ -244,6 +258,9 @@ local function TouchListenerAnswerBox1(touch)
     if (answerboxAlreadyTouched == false) and 
         (alternateAnswerBox2AlreadyTouched == false) then
 
+    if (answerboxAlreadyTouched == false) and 
+        (alternateAnswerBox3AlreadyTouched == false) then
+
         if (touch.phase == "began") then
             --let other boxes know it has been clicked
             alternateAnswerBox1AlreadyTouched = true
@@ -284,6 +301,9 @@ local function TouchListenerAnswerBox2(touch)
     if (answerboxAlreadyTouched == false) and 
         (alternateAnswerBox1AlreadyTouched == false) then
 
+    if (answerboxAlreadyTouched == false) and 
+        (alternateAnswerBox3AlreadyTouched == false) then
+
         if (touch.phase == "began") then
             --let other boxes know it has been clicked
             alternateAnswerBox2AlreadyTouched = true
@@ -318,11 +338,55 @@ local function TouchListenerAnswerBox2(touch)
     end
 end 
 
+
+local function TouchListenerAnswerBox2(touch)
+    --only work if none of the other boxes have been touched
+    if (answerboxAlreadyTouched == false) and 
+        (alternateAnswerBox1AlreadyTouched == false) then
+
+    if (answerboxAlreadyTouched == false) and 
+        (alternateAnswerBox2AlreadyTouched == false) then
+
+        if (touch.phase == "began") then
+            --let other boxes know it has been clicked
+            alternateAnswerBox3AlreadyTouched = true
+            
+        elseif (touch.phase == "moved") then
+            --dragging function
+            alternateAnswerBox3.x = touch.x
+            alternateAnswerBox3.y = touch.y
+
+        elseif (touch.phase == "ended") then
+            alternateAnswerBox3AlreadyTouched = false
+
+            -- if the box is in the userAnswerBox Placeholder  go to center of placeholder
+            if (((userAnswerBoxPlaceholder.x - userAnswerBoxPlaceholder.width/2) < alternateAnswerBox2.x ) and 
+                ((userAnswerBoxPlaceholder.x + userAnswerBoxPlaceholder.width/2) > alternateAnswerBox2.x ) and 
+                ((userAnswerBoxPlaceholder.y - userAnswerBoxPlaceholder.height/2) < alternateAnswerBox2.y ) and 
+                ((userAnswerBoxPlaceholder.y + userAnswerBoxPlaceholder.height/2) > alternateAnswerBox2.y ) ) then
+
+                alternateAnswerBox3.x = userAnswerBoxPlaceholder.x
+                alternateAnswerBox3.y = userAnswerBoxPlaceholder.y
+                userAnswer = alternateAnswer2
+
+                -- call the function to check if the user's input is correct or not
+                CheckUserAnswerInput()
+
+            --else make box go back to where it was
+            else
+                alternateAnswerBox3.x = alternateAnswerBox3PreviousX
+                alternateAnswerBox3.y = alternateAnswerBox3PreviousY
+            end
+        end
+    end
+end 
+
 -- Function that Adds Listeners to each answer box
 local function AddAnswerBoxEventListeners()
     answerbox:addEventListener("touch", TouchListenerAnswerbox)
     alternateAnswerBox1:addEventListener("touch", TouchListenerAnswerBox1)
     alternateAnswerBox2:addEventListener("touch", TouchListenerAnswerBox2)
+    alternateAnswerBox3:addEventListener("touch", TouchListenerAnswerBox3)
 end 
 
 -- Function that Removes Listeners to each answer box
@@ -330,6 +394,8 @@ local function RemoveAnswerBoxEventListeners()
     answerbox:removeEventListener("touch", TouchListenerAnswerbox)
     alternateAnswerBox1:removeEventListener("touch", TouchListenerAnswerBox1)
     alternateAnswerBox2:removeEventListener("touch", TouchListenerAnswerBox2)
+    alternateAnswerBox3:removeEventListener("touch", TouchListenerAnswerBox3)
+
 end 
 
 ----------------------------------------------------------------------------------
